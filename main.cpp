@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 
 using namespace std;
@@ -17,12 +18,20 @@ void display(string word, const bool openLetters[], size_t n) {
 }
 
 int main() {
-    string word = "avocado";
+    srand(time(nullptr));
+    char number = rand() % 10;
+
+    string word;
+    ifstream file("/home/vladimir/ClionProjects/words.txt");
+    for (int i = 0; i < number; i++) {
+        getline(file, word);
+    }
+    file.close();
+
     size_t n = word.length();
     bool openLetters[n];
 
     // открываем 2 буквы
-    srand(time(nullptr));
     char a = word[rand() % n];
     char b = word[rand() % n];
     while (b == a) {

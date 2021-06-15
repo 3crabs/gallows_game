@@ -230,6 +230,9 @@ void game() {
                 window.close();
             }
             if (event.type == Event::KeyReleased) {
+                if (countLives == 0 || calcCountClosedLetters(w) == 0) {
+                    window.close();
+                }
                 Keyboard::Key keycode = event.key.code;
                 if (keycode >= Keyboard::A && keycode <= Keyboard::Z) {
                     char letter = static_cast<char>(keycode - Keyboard::A + 'a');

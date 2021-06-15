@@ -4,11 +4,25 @@
 
 using namespace std;
 
-void display(string word, const bool openLetters[], size_t n) {
+class Word {
+
+public:
+    explicit Word(const string &word) {
+        this->str = word;
+        this->n = word.length();
+        this->openLetters = new bool[n]();
+    }
+
+    size_t n;
+    bool *openLetters;
+    string str;
+};
+
+void display(Word w) {
     cout << "What is it?" << endl;
-    for (int i = 0; i < n; i++) {
-        if (openLetters[i]) {
-            cout << word.at(i);
+    for (int i = 0; i < w.n; i++) {
+        if (w.openLetters[i]) {
+            cout << w.str.at(i);
         } else {
             cout << "_";
         }
@@ -17,60 +31,62 @@ void display(string word, const bool openLetters[], size_t n) {
     cout << endl;
 }
 
-int main() {
-    srand(time(nullptr));
-    char number = rand() % 10;
-
-    string word;
-    ifstream file("/home/vladimir/ClionProjects/words.txt");
-    for (int i = 0; i < number; i++) {
-        getline(file, word);
-    }
-    file.close();
-
-    size_t n = word.length();
-    bool openLetters[n];
-
-    // открываем 2 буквы
-    char a = word[rand() % n];
-    char b = word[rand() % n];
-    while (b == a) {
-        b = word[rand() % n];
-    }
-    for (int i = 0; i < n; i++) {
-        openLetters[i] = word[i] == a || word[i] == b;
-    }
-
-    // игра
+int calcCountClosedLetters(const Word &w) {
     int countClosedLetters = 0;
-    for (int i = 0; i < n; i++) {
-        if (!openLetters[i]) {
+    for (int i = 0; i < w.n; i++) {
+        if (!w.openLetters[i]) {
             countClosedLetters++;
         }
     }
-    display(word, openLetters, n);
+    return countClosedLetters;
+}
+
+string selectWordFromFile() {
+    int number = rand() % 10;
+    string str;
+    ifstream file("/home/vladimir/ClionProjects/words.txt");
+    for (int i = 0; i < number; i++) {
+        getline(file, str);
+    }
+    file.close();
+    return str;
+}
+
+int main() {
+    srand(time(nullptr));
+    string str = selectWordFromFile();
+    Word w(str);
+
+    // открываем 2 буквы
+    char a = w.str[rand() % w.n];
+    char b = w.str[rand() % w.n];
+    while (b == a) {
+        b = w.str[rand() % w.n];
+    }
+    for (int i = 0; i < w.n; i++) {
+        w.openLetters[i] = w.str[i] == a || w.str[i] == b;
+    }
+
+    // игра
+    int countClosedLetters = calcCountClosedLetters(w);
+    display(w);
     int countLives = 6;
     while (countLives && countClosedLetters) {
         cout << "Input letter (" << countLives << "): ";
         char letter;
         cin >> letter;
         bool newLetter = false;
-        for (int i = 0; i < n; i++) {
-            if (word[i] == letter && !openLetters[i]) {
-                openLetters[i] = true;
+        for (int i = 0; i < w.n; i++) {
+            if (w.str[i] == letter && !w.openLetters[i]) {
+                w.openLetters[i] = true;
                 newLetter = true;
             }
         }
-        display(word, openLetters, n);
+        display(w);
         if (!newLetter) {
             countLives--;
         }
-        countClosedLetters = 0;
-        for (int i = 0; i < n; i++) {
-            if (!openLetters[i]) {
-                countClosedLetters++;
-            }
-        }
+        countClosedLetters = calcCountClosedLetters(w);
     }
 
     if (countLives) {

@@ -18,17 +18,15 @@ public:
     string str;
 };
 
-void displayGame(Word w) {
-    cout << "What is it?" << endl;
-    for (int i = 0; i < w.n; i++) {
-        if (w.openLetters[i]) {
-            cout << w.str.at(i);
-        } else {
-            cout << "_";
-        }
-        cout << " ";
+string selectWordFromFile() {
+    int number = rand() % 10;
+    string str;
+    ifstream file("/home/vladimir/ClionProjects/words.txt");
+    for (int i = 0; i < number; i++) {
+        getline(file, str);
     }
-    cout << endl;
+    file.close();
+    return str;
 }
 
 int calcCountClosedLetters(const Word &w) {
@@ -41,15 +39,32 @@ int calcCountClosedLetters(const Word &w) {
     return countClosedLetters;
 }
 
-string selectWordFromFile() {
-    int number = rand() % 10;
-    string str;
-    ifstream file("/home/vladimir/ClionProjects/words.txt");
-    for (int i = 0; i < number; i++) {
-        getline(file, str);
+bool runGame(int countLives, int countClosedLetters) {
+    return countLives && countClosedLetters;
+}
+
+bool step(char letter, Word w) {
+    bool newLetter = false;
+    for (int i = 0; i < w.n; i++) {
+        if (w.str[i] == letter && !w.openLetters[i]) {
+            w.openLetters[i] = true;
+            newLetter = true;
+        }
     }
-    file.close();
-    return str;
+    return newLetter;
+}
+
+void displayGame(Word w) {
+    cout << "What is it?" << endl;
+    for (int i = 0; i < w.n; i++) {
+        if (w.openLetters[i]) {
+            cout << w.str.at(i);
+        } else {
+            cout << "_";
+        }
+        cout << " ";
+    }
+    cout << endl;
 }
 
 void displayEnd(int countLives) {
@@ -86,22 +101,15 @@ int main() {
     // игра
     int countClosedLetters = calcCountClosedLetters(w);
     displayGame(w);
-    while (countLives && countClosedLetters) {
+    while (runGame(countLives, countClosedLetters)) {
         char letter = inputLetter();
-        bool newLetter = false;
-        for (int i = 0; i < w.n; i++) {
-            if (w.str[i] == letter && !w.openLetters[i]) {
-                w.openLetters[i] = true;
-                newLetter = true;
-            }
-        }
+        bool newLetter = step(letter, w);
         if (!newLetter) {
             countLives--;
         }
         countClosedLetters = calcCountClosedLetters(w);
         displayGame(w);
     }
-
     displayEnd(countLives);
 
     return 0;

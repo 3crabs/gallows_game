@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 
 using namespace std;
@@ -9,17 +10,23 @@ class Word {
 public:
     explicit Word(const string &word) {
         this->str = word;
-        this->n = word.length();
-        this->openLetters = new bool[n]();
+        this->n = int(word.length());
+        for (int i = 0; i < n; i++) {
+            this->openLetters.push_back(false);
+        }
     }
 
-    size_t n;
-    bool *openLetters;
+    int n;
+    vector<bool> openLetters;
     string str;
 };
 
+int randomInt(int n) {
+    return rand() % n;
+}
+
 string selectWordFromFile() {
-    int number = rand() % 10;
+    int number = randomInt(10);
     string str;
     ifstream file("/home/vladimir/ClionProjects/words.txt");
     for (int i = 0; i < number; i++) {
@@ -88,17 +95,15 @@ int main() {
     Word w(str);
     int countLives = 6;
 
-    // открываем 2 буквы
-    char a = w.str[rand() % w.n];
-    char b = w.str[rand() % w.n];
+    char a = w.str[randomInt(w.n)];
+    char b = w.str[randomInt(w.n)];
     while (b == a) {
-        b = w.str[rand() % w.n];
+        b = w.str[randomInt(w.n)];
     }
     for (int i = 0; i < w.n; i++) {
         w.openLetters[i] = w.str[i] == a || w.str[i] == b;
     }
 
-    // игра
     int countClosedLetters = calcCountClosedLetters(w);
     displayGame(w);
     while (runGame(countLives, countClosedLetters)) {

@@ -2,9 +2,11 @@
 #include <fstream>
 #include <vector>
 #include <cassert>
+#include <SFML/Graphics.hpp>
 
 
 using namespace std;
+using namespace sf;
 
 /**
  * слово для игры
@@ -110,40 +112,18 @@ bool step(char letter, Word &w) {
  * вывод текущего состояния игры
  * @param w слово типа Word
  */
-void displayGame(Word w) {
-    cout << "What is it?" << endl;
+// todo tests
+string createDisplayString(Word w) {
+    string s;
     for (int i = 0; i < w.n; i++) {
         if (w.openLetters[i]) {
-            cout << w.str.at(i);
+            s += w.str.at(i);
         } else {
-            cout << "_";
+            s += "_";
         }
-        cout << " ";
+        s += " ";
     }
-    cout << endl;
-}
-
-/**
- * вывод окончания игры
- * @param countLives количество оставшихся жизней игрока
- */
-void displayEnd(int countLives) {
-    if (countLives) {
-        cout << "Win!" << endl;
-    } else {
-        cout << "Loss!" << endl;
-    }
-}
-
-/**
- * ввод буквы
- * @return буква которую ввел пользователь
- */
-char inputLetter() {
-    char letter;
-    cout << "Input letter: ";
-    cin >> letter;
-    return letter;
+    return s;
 }
 
 /**
@@ -197,18 +177,86 @@ void game() {
         w.openLetters[i] = w.str[i] == a || w.str[i] == b;
     }
 
-    int countClosedLetters = calcCountClosedLetters(w);
-    displayGame(w);
-    while (runGame(countLives, countClosedLetters)) {
-        char letter = inputLetter();
-        bool newLetter = step(letter, w);
-        if (!newLetter) {
-            countLives--;
-        }
-        countClosedLetters = calcCountClosedLetters(w);
-        displayGame(w);
+    RenderWindow window(VideoMode(400, 300), "gallows_game");
+
+    Font font;
+    if (!font.loadFromFile("/home/vladimir/ClionProjects/arial.ttf")) {
+        exit(1);
     }
-    displayEnd(countLives);
+
+    Text livesText;
+    livesText.setFont(font);
+    livesText.setFillColor(sf::Color::Black);
+    livesText.setString("lives: " + to_string(countLives));
+    livesText.setPosition(Vector2f(10, 10));
+
+    Text textQuestion;
+    textQuestion.setFont(font);
+    textQuestion.setFillColor(sf::Color::Black);
+    textQuestion.setString("What is it?");
+    FloatRect textRect = textQuestion.getLocalBounds();
+    textQuestion.setOrigin(textRect.width / 2, textRect.height / 2);
+    textQuestion.setPosition(Vector2f(float(window.getSize().x) / 2.0f, float(window.getSize().y) / 4.0f));
+
+    Text text;
+    text.setFont(font);
+    text.setFillColor(sf::Color::Black);
+    text.setString(createDisplayString(w));
+    textRect = text.getLocalBounds();
+    text.setOrigin(textRect.width / 2, textRect.height / 2);
+    text.setPosition(Vector2f(float(window.getSize().x) / 2.0f, float(window.getSize().y) / 2.0f));
+
+    Text textTab;
+    textTab.setFont(font);
+    textTab.setFillColor(sf::Color::Black);
+    textTab.setString("tab any letter");
+    textRect = textTab.getLocalBounds();
+    textTab.setOrigin(textRect.width / 2, textRect.height / 2);
+    textTab.setPosition(Vector2f(float(window.getSize().x) / 2.0f, float(window.getSize().y) / 4.0f * 3.0f));
+
+    int countClosedLetters = calcCountClosedLetters(w);
+    while (window.isOpen()) {
+        Event event{};
+        while (window.pollEvent(event)) {
+            if (event.type == Event::Closed) {
+                window.close();
+            }
+            if (event.type == Event::KeyReleased) {
+                Keyboard::Key keycode = event.key.code;
+                if (keycode >= Keyboard::A && keycode <= Keyboard::Z) {
+                    char letter = static_cast<char>(keycode - Keyboard::A + 'a');
+                    bool newLetter = step(letter, w);
+                    text.setString(createDisplayString(w));
+                    textRect = text.getLocalBounds();
+                    text.setOrigin(textRect.width / 2, textRect.height / 2);
+                    text.setPosition(Vector2f(float(window.getSize().x) / 2.0f, float(window.getSize().y) / 2.0f));
+                    if (!newLetter) {
+                        countLives--;
+                    }
+                    countClosedLetters = calcCountClosedLetters(w);
+                    if (!runGame(countLives, countClosedLetters)) {
+                        if (countLives) {
+                            textTab.setString("WIN!!!");
+                        } else {
+                            textTab.setString("LOSE!!!");
+                        }
+                        textRect = textTab.getLocalBounds();
+                        textTab.setOrigin(textRect.width / 2, textRect.height / 2);
+                        textTab.setPosition(
+                                Vector2f(float(window.getSize().x) / 2.0f, float(window.getSize().y) / 4.0f * 3.0f));
+                    }
+                    livesText.setString("lives: " + to_string(countLives));
+                }
+            }
+        }
+
+        window.clear(Color::White);
+        window.draw(livesText);
+        window.draw(textQuestion);
+        window.draw(text);
+        window.draw(textTab);
+        window.display();
+    }
 }
 
 int main(int argc, char *argv[]) {

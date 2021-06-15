@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <cassert>
 
 
 using namespace std;
@@ -94,7 +95,7 @@ bool runGame(int countLives, int countClosedLetters) {
  * @param w слово типа Word
  * @return признак успеха игрока
  */
-bool step(char letter, Word w) {
+bool step(char letter, Word &w) {
     bool newLetter = false;
     for (int i = 0; i < w.n; i++) {
         if (w.str[i] == letter && !w.openLetters[i]) {
@@ -145,7 +146,43 @@ char inputLetter() {
     return letter;
 }
 
-int main() {
+/**
+ * тестируем
+ */
+void test() {
+    assert(runGame(0, 0) == false);
+    assert(runGame(1, 0) == false);
+    assert(runGame(0, 1) == false);
+    assert(runGame(1, 1) == true);
+    cout << "tests runGame ok" << endl;
+
+    Word w1("toy");
+    assert(calcCountClosedLetters(w1) == 3);
+    w1.openLetters[0] = true;
+    assert(calcCountClosedLetters(w1) == 2);
+    w1.openLetters[1] = true;
+    assert(calcCountClosedLetters(w1) == 1);
+    w1.openLetters[2] = true;
+    assert(calcCountClosedLetters(w1) == 0);
+    cout << "tests calcCountClosedLetters ok" << endl;
+
+    Word w2("toy");
+    assert(calcCountClosedLetters(w2) == 3);
+    assert(step('t', w2) == true);
+    assert(calcCountClosedLetters(w2) == 2);
+    assert(step('t', w2) == false);
+    assert(calcCountClosedLetters(w2) == 2);
+    assert(step('o', w2) == true);
+    assert(calcCountClosedLetters(w2) == 1);
+    assert(step('y', w2) == true);
+    assert(calcCountClosedLetters(w2) == 0);
+    cout << "tests step ok" << endl;
+}
+
+/**
+ * играем
+ */
+void game() {
     srand(time(nullptr));
     string str = selectWordFromFile();
     Word w(str);
@@ -172,6 +209,13 @@ int main() {
         displayGame(w);
     }
     displayEnd(countLives);
+}
 
+int main(int argc, char *argv[]) {
+    if (argc == 2 && string(argv[1]) == "test") {
+        test();
+    } else {
+        game();
+    }
     return 0;
 }

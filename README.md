@@ -21,8 +21,18 @@
 
 ## Фото игры
 
+### Процесс игры
+
 ![фото игры](https://raw.githubusercontent.com/3crabs/gallows_game/main/img_1.png)
+
+### Победа
 
 ![фото игры](https://raw.githubusercontent.com/3crabs/gallows_game/main/img_2.png)
 
+### Процесс игры
+
 ![фото игры](https://raw.githubusercontent.com/3crabs/gallows_game/main/img_3.png)
+
+### Поражение
+
+![фото игры](https://raw.githubusercontent.com/3crabs/gallows_game/main/img_4.png)

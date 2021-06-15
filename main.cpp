@@ -223,7 +223,6 @@ void game() {
     textTab.setOrigin(textRect.width / 2, textRect.height / 2);
     textTab.setPosition(Vector2f(float(window.getSize().x) / 2.0f, float(window.getSize().y) / 4.0f * 3.0f));
 
-    int countClosedLetters = calcCountClosedLetters(w);
     while (window.isOpen()) {
         Event event{};
         while (window.pollEvent(event)) {
@@ -239,11 +238,10 @@ void game() {
                     textRect = text.getLocalBounds();
                     text.setOrigin(textRect.width / 2, textRect.height / 2);
                     text.setPosition(Vector2f(float(window.getSize().x) / 2.0f, float(window.getSize().y) / 2.0f));
-                    if (!newLetter) {
+                    if (!newLetter && countLives) {
                         countLives--;
                     }
-                    countClosedLetters = calcCountClosedLetters(w);
-                    if (!runGame(countLives, countClosedLetters)) {
+                    if (!runGame(countLives, calcCountClosedLetters(w))) {
                         if (countLives) {
                             textTab.setString("WIN!!!");
                         } else {
@@ -251,8 +249,10 @@ void game() {
                         }
                         textRect = textTab.getLocalBounds();
                         textTab.setOrigin(textRect.width / 2, textRect.height / 2);
-                        textTab.setPosition(
-                                Vector2f(float(window.getSize().x) / 2.0f, float(window.getSize().y) / 4.0f * 3.0f));
+                        textTab.setPosition(Vector2f(
+                                float(window.getSize().x) / 2.0f,
+                                float(window.getSize().y) / 4.0f * 3.0f)
+                        );
                     }
                     livesText.setString("lives: " + to_string(countLives));
                 }

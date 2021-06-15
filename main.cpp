@@ -112,7 +112,6 @@ bool step(char letter, Word &w) {
  * вывод текущего состояния игры
  * @param w слово типа Word
  */
-// todo tests
 string createDisplayString(Word w) {
     string s;
     for (int i = 0; i < w.n; i++) {
@@ -157,6 +156,16 @@ void test() {
     assert(step('y', w2) == true);
     assert(calcCountClosedLetters(w2) == 0);
     cout << "tests step ok" << endl;
+
+    Word w3("toy");
+    assert(createDisplayString(w3) == "_ _ _ ");
+    w3.openLetters[1] = true;
+    assert(createDisplayString(w3) == "_ o _ ");
+    w3.openLetters[2] = true;
+    assert(createDisplayString(w3) == "_ o y ");
+    w3.openLetters[0] = true;
+    assert(createDisplayString(w3) == "t o y ");
+    cout << "tests createDisplayString ok" << endl;
 }
 
 /**

@@ -58,7 +58,7 @@ int randomInt(int n) {
 string selectWordFromFile() {
     int number = randomInt(10);
     string str;
-    ifstream file("/home/vladimir/ClionProjects/words.txt");
+    ifstream file("resources/words.txt");
     for (int i = 0; i < number; i++) {
         getline(file, str);
     }
@@ -189,7 +189,7 @@ void game() {
     RenderWindow window(VideoMode(400, 300), "gallows_game");
 
     Font font;
-    if (!font.loadFromFile("/home/vladimir/ClionProjects/arial.ttf")) {
+    if (!font.loadFromFile("resources/arial.ttf")) {
         exit(1);
     }
 
